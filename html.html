@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adminov sistem za sledenje lokacije</title>
+</head>
+<body>
+  <h1>Adminov sistem za sledenje</h1>
+  <p id="status">Sledenje lokaciji...</p>
+
+  <script>
+    function sendLocationToServer(lat, lng) {
+      fetch('http://localhost:3000/update-location', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ lat: lat, lng: lng }),
+      })
+      .then(response => response.text())
+      .then(result => console.log(result))
+      .catch(error => console.log('Napaka:', error));
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition(function(position) {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        document.getElementById('status').innerHTML = `Trenutna lokacija: Širina: ${lat}, Dolžina: ${lng}`;
+
+        // Pošlji lokacijo na strežnik
+        sendLocationToServer(lat, lng);
+      }, function(error) {
+        console.log('Napaka pri pridobivanju lokacije:', error);
+      });
+    } else {
+      console.log('Geolokacija ni podprta');
+    }
+  </script>
+</body>
+</html>
