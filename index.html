@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Google Maps with Geolocation & Geocoding</title>
+  <title>Google Maps - Static User Location</title>
   <style>
     /* Set the size of the map container */
     #map {
@@ -13,107 +13,43 @@
   </style>
 </head>
 <body>
-  <h1>Google Maps with Geolocation & Geocoding</h1>
-  <p id="status">Fetching location...</p>
+  <h1>Google Maps - Static User Location</h1>
+  <p id="status">Prikazujem vašo lokacijo...</p>
   <div id="map"></div>
 
   <script>
-    // Get user's current location using Geolocation API
-    function getUserLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showUserLocation, showError);
-      } else {
-        document.getElementById('status').innerHTML = "Geolocation is not supported by this browser.";
-      }
-    }
+    // Določite svojo lokacijo (širina in dolžina)
+    const myLatitude = 46.056946; // Primer: vaša dejanska širina (spremenite na vaše koordinate)
+    const myLongitude = 14.505751; // Primer: vaša dejanska dolžina (spremenite na vaše koordinate)
 
-    function showUserLocation(position) {
-      const userLat = position.coords.latitude;
-      const userLon = position.coords.longitude;
-
-      document.getElementById('status').innerHTML = `User's Location: Latitude: ${userLat}, Longitude: ${userLon}`;
+    // Inicializacija zemljevida s statično lokacijo
+    function initMap() {
+      // Vaša lokacija
+      const myLocation = { lat: myLatitude, lng: myLongitude };
       
-      // Initialize the map and show user's location
-      initMap(userLat, userLon);
-      
-      // Fetch and show geocoded address
-      fetchAddressAndShowOnMap(userLat, userLon);
-    }
-
-    // Fetch the geocoded address using Geoapify API and display it on the map
-    function fetchAddressAndShowOnMap(userLat, userLon) {
-      const geoapifyApiKey = '261d829e84a24b8398ead19f12926659'; // Replace with your Geoapify API key
-      const address = "38 Upper Montagu Street, Westminster W1H 1LJ, United Kingdom";
-      const url = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(address)}&apiKey=${geoapifyApiKey}`;
-
-      fetch(url)
-        .then(response => response.json())
-        .then(result => {
-          if (result.features && result.features.length > 0) {
-            const locationData = result.features[0].properties;
-            const lat = locationData.lat;
-            const lon = locationData.lon;
-
-            // Display the geocoded location on the map
-            const geocodedLocation = { lat: lat, lng: lon };
-            const marker = new google.maps.Marker({
-              position: geocodedLocation,
-              map: map,
-              title: "Geocoded Address Location",
-            });
-          } else {
-            document.getElementById('status').innerHTML = 'Address location not found';
-          }
-        })
-        .catch(error => {
-          console.log('Error fetching geocoded address:', error);
-          document.getElementById('status').innerHTML = 'Error fetching address location';
-        });
-    }
-
-    // Initialize Google Maps with user's location
-    let map;
-    function initMap(userLat, userLon) {
-      // Center the map at user's location
-      const userLocation = { lat: userLat, lng: userLon };
-      map = new google.maps.Map(document.getElementById('map'), {
+      // Ustvari Google zemljevide na določenem mestu
+      const map = new google.maps.Map(document.getElementById('map'), {
         zoom: 12,
-        center: userLocation,
+        center: myLocation,
       });
 
-      // Place a marker for the user's current location
+      // Marker za vašo lokacijo
       const marker = new google.maps.Marker({
-        position: userLocation,
+        position: myLocation,
         map: map,
-        title: "User's Current Location",
+        title: "Moja Lokacija",
       });
+
+      document.getElementById('status').innerHTML = `Vaša lokacija: Širina: ${myLatitude}, Dolžina: ${myLongitude}`;
     }
 
-    // Handle Geolocation errors
-    function showError(error) {
-      switch(error.code) {
-        case error.PERMISSION_DENIED:
-          document.getElementById('status').innerHTML = "User denied the request for Geolocation.";
-          break;
-        case error.POSITION_UNAVAILABLE:
-          document.getElementById('status').innerHTML = "Location information is unavailable.";
-          break;
-        case error.TIMEOUT:
-          document.getElementById('status').innerHTML = "The request to get user location timed out.";
-          break;
-        case error.UNKNOWN_ERROR:
-          document.getElementById('status').innerHTML = "An unknown error occurred.";
-          break;
-      }
-    }
-
-    // Trigger Geolocation on page load
-    window.onload = getUserLocation;
+    // Naloži zemljevid ob nalaganju strani
+    window.onload = initMap;
   </script>
 
-  <!-- Google Maps API (replace YOUR_GOOGLE_MAPS_API_KEY with your actual API key) -->
+  <!-- Google Maps API (zamenjajte YOUR_GOOGLE_MAPS_API_KEY z vašim dejanskim API ključem) -->
   <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCvwgLi8yBs8M9FFiBgDH5twePppa9PjDU&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap">
   </script>
 </body>
 </html>
