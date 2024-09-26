@@ -1,79 +1,82 @@
 <!DOCTYPE html>
-<html lang="sl">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Maps - Moja Lokacija</title>
-    <style>
-        /* Določi velikost za zemljevid */
-        #map {
-            height: 100vh; /* Višina naj bo 100% višine pogleda */
-            width: 100%; /* Širina naj bo 100% širine okna */
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Praćenje Lokacije sa Google Maps API</title>
+  <!-- Zamenite ključ sa vašim novim API ključem -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_NEW_API_KEY&callback=initMap&libraries=places" async defer></script>
+  <style>
+    #map {
+      height: 400px;
+      width: 100%;
+    }
+  </style>
 </head>
 <body>
+  <h3>Trenutna Lokacija:</h3>
+  <div id="address"></div>
+  <div id="map"></div>
 
-<h3>Prikaz moje lokacije na Google Zemljevidu</h3>
-<!-- Div, kjer bo prikazan zemljevid -->
-<div id="map"></div>
+  <script>
+    let map, marker;
 
-<!-- Google Maps API -->
-<script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCh4eKnqQRRiTKLAq4bSfa_iyWqGaW9YZs&callback=initMap"
-  async
-  defer
-></script>
-
-<script>
-    // Funkcija za inicializacijo zemljevida
     function initMap() {
-        // Preveri, če je geolokacija na voljo
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                // Pridobi trenutne koordinate uporabnika
-                var userLocation = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                };
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: -34.397, lng: 150.644},
+        zoom: 15
+      });
 
-                // Ustvari nov zemljevid in ga prikazi v 'map' divu
-                var map = new google.maps.Map(document.getElementById('map'), {
-                    zoom: 15, // povečava
-                    center: userLocation // center na trenutni lokaciji uporabnika
-                });
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(success, error, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        });
+      } else {
+        alert("Geolokacija nije podržana u ovom pretraživaču.");
+      }
+    }
 
-                // Dodaj marker na trenutno lokacijo
-                var marker = new google.maps.Marker({
-                    position: userLocation,
-                    map: map,
-                    title: "Tukaj si!"
-                });
-            }, function() {
-                // Če geolokacija ne uspe, prikaži privzeto lokacijo (npr. Ljubljana)
-                handleLocationError(true, map);
-            });
+    function success(position) {
+      const pos = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      };
+
+      map.setCenter(pos);
+
+      if (!marker) {
+        marker = new google.maps.Marker({
+          position: pos,
+          map: map,
+          title: "Vaša Lokacija",
+        });
+      } else {
+        marker.setPosition(pos);
+      }
+
+      getGeocodedAddress(pos);
+    }
+
+    function error(err) {
+      console.warn(`ERROR(${err.code}): ${err.message}`);
+    }
+
+    function getGeocodedAddress(latlng) {
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ location: latlng }, (results, status) => {
+        if (status === "OK") {
+          if (results[0]) {
+            document.getElementById('address').innerText = results[0].formatted_address;
+          } else {
+            document.getElementById('address').innerText = "Nema rezultata za ovu lokaciju";
+          }
         } else {
-            // Brskalnik ne podpira geolokacije
-            handleLocationError(false, map);
+          document.getElementById('address').innerText = "Geocoder greška: " + status;
         }
+      });
     }
-
-    // Funkcija za obravnavo napake pri geolokaciji
-    function handleLocationError(browserHasGeolocation, map) {
-        var defaultLocation = { lat: 46.056946, lng: 14.505751 }; // Ljubljana
-        map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 10,
-            center: defaultLocation
-        });
-
-        var marker = new google.maps.Marker({
-            position: defaultLocation,
-            map: map,
-            title: "Geolokacija ni na voljo. Prikazana je Ljubljana."
-        });
-    }
-</script>
-
+  </script>
 </body>
 </html>
