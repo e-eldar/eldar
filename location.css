@@ -1,0 +1,77 @@
+/* Generalno stiliziranje */
+body {
+    font-family: 'Open Sans', sans-serif;
+    margin: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+header {
+    background-color: #333;
+    padding: 15px 0;
+    border-bottom: 2px solid #f8c040 ;
+}
+
+nav ul {
+    list-style: none;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 15px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: white;
+    padding: 10px 15px;
+    background-color: #333;
+    border-radius: 5px;
+}
+
+nav ul li a:hover {
+    background-color: #f8c040;
+}
+
+.location-info {
+    text-align: center;
+    padding: 50px 0;
+}
+
+.location-info h1 {
+    color: #333;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.location-info p {
+    font-size: 1.2rem;
+    margin-bottom: 32%;
+    color: #666;
+}
+
+.map-container {
+    max-width:800px;
+    margin: 0 auto;
+}
+
+.map-container img {
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+footer {
+    text-align: center;
+    background-color: #333;
+    color: white;
+    padding: 20px 0;
+    border-top: 2px solid #f8c040;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+}
