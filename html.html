@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Location Tracker</title>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCh4eKnqQRRiTKLAq4bSfa_iyWqGaW9YZs"></script>
+  <style>
+    #map {
+      height: 100vh; /* Fullscreen map */
+      width: 100%; /* Full width */
+    }
+    #status {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div id="status">Location tracking is OFF.</div>
+  <div id="map"></div>
+
+  <script>
+    let map;
+    let marker;
+    let watchId;
+
+    // Initialize the map
+    function initMap() {
+      // Default location (centered on the map)
+      const initialPosition = { lat: 0, lng: 0 };
+
+      // Create the map
+      map = new google.maps.Map(document.getElementById("map"), {
+        center: initialPosition,
+        zoom: 15,
+      });
+
+      // Add a marker at the initial position
+      marker = new google.maps.Marker({
+        position: initialPosition,
+        map: map,
+        title: "Your Location",
+      });
+
+      // Try to track the user's location
+      trackLocation();
+    }
+
+    // Function to track the user's location
+    function trackLocation() {
+      const status = document.getElementById("status");
+
+      if (navigator.geolocation) {
+        watchId = navigator.geolocation.watchPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+
+            // Update the marker's position
+            const newPosition = { lat: latitude, lng: longitude };
+            marker.setPosition(newPosition);
+
+            // Center the map on the new position
+            map.setCenter(newPosition);
+
+            // Update the status text
+            status.textContent = `Latitude: ${latitude.toFixed(
+              6
+            )}, Longitude: ${longitude.toFixed(6)} (Tracking ON)`;
+          },
+          (error) => {
+            console.error("Error getting location:", error);
+            status.textContent = "Error retrieving location.";
+          },
+          { enableHighAccuracy: true }
+        );
+      } else {
+        status.textContent = "Geolocation is not supported by your browser.";
+      }
+    }
+
+    // Stop location tracking
+    function stopTracking() {
+      if (watchId) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+        document.getElementById("status").textContent = "Tracking is OFF.";
+      }
+    }
+
+    // Initialize the map when the page loads
+    window.onload = initMap;
+  </script>
+</body>
+</html>
